@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Grid, Container, Typography } from "@mui/material";
 import { FeedbackComplaintCard } from "./FeedbackComplaintCard";
-import MyComplaintDialog from "./MyComplaintDialog";
 import { useQuery } from "@apollo/client";
-import { LIST_COMPLAINTS_FEW } from "../../gql/queries/COMPLAINT";
+import { LIST_COMPLAINTS_FEW, VIEW_RESOLVED_COMPLAINT } from "../../gql/queries/COMPLAINT";
 import SnackBar from "../../snackbar/SnackBar";
 import { useNavigate } from "react-router-dom";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import { AuthContext } from "../../App";
-import { VIEW_COMPLAINT } from "../../gql/queries/COMPLAINT";
 import { useApolloClient } from "@apollo/client";
 import { LIST_COMMENTS } from "../../gql/queries/COMMENT";
 import CommentDialog from "./CommentDialog";
+import FeedbackComplaintDialog from "./FeedbackComplaintDialog";
 
 
 const FeedbackComplaints = () => {
@@ -84,16 +83,16 @@ const FeedbackComplaints = () => {
       let complaintId = id;
       let userId = authContext.userId;
       let res = await client.query({
-        query: VIEW_COMPLAINT,
+        query: VIEW_RESOLVED_COMPLAINT,
         variables: {
           complaintId,
           userId,
         },
         fetchPolicy: "network-only",
       });
+      console.log(res)
       setHardLoading(false)
-      let detailedComplaint = { data: res?.data?.viewComplaint };
-      handleViewDetails(detailedComplaint);
+      handleViewDetails(res?.data?.viewResolvedComplaint);
     } catch (error) {
       setHardLoading(false)
       if (error.message === "Unauthorized client in the scope") {
@@ -196,7 +195,7 @@ const FeedbackComplaints = () => {
           </Grid>
         </Container>
       )}
-      <MyComplaintDialog
+      <FeedbackComplaintDialog
         open={dialogOpen}
         handleClose={handleDialogClose}
         complaint={selectedComplaint}
